@@ -218,6 +218,7 @@ always@(posedge clk )
 					state = 4'b0001;
 					over = 1;
 					isPrime = 0;
+					$display(isPrime);
 				end
 				else
 				begin
@@ -379,4 +380,3 @@ module topmodule(Go,n,clk,isPrime);
 	behaviouralFSM bFSM(clk,Go,enregx,enregn,enregdiv,enregrem,enregrem1,enregdv,enreg2,ldx
 	,ldn,ldrem,ldrem1,lddv,lddiv,ld2,Bo,eqz,N,isPrime,over,divover);
 endmodule
-    
