@@ -1,0 +1,30 @@
+Net "clk" loc="p76";
+Net "sw[0]" loc="p27";
+Net "sw[1]" loc="p28";
+Net "sw[2]" loc="p24";
+Net "sw[3]" loc="p26";
+Net "sw[4]" loc="p21";
+Net "sw[5]" loc="p22";
+Net "sw[6]" loc="p19";
+Net "sw[7]" loc="p20";
+
+Net "go" loc="p9";
+Net "rst" loc="p10";
+
+
+Net "display[0]" loc="p139";
+Net "display[1]" loc="p140";
+Net "display[2]" loc="p137";
+Net "display[3]" loc="p138";
+Net "display[4]" loc="p133";
+Net "display[5]" loc="p135";
+Net "display[6]" loc="p131";
+Net "display[7]" loc="p132";
+Net "display[8]" loc="p149";
+Net "display[9]" loc="p150";
+Net "display[10]" loc="p147";
+Net "display[11]" loc="p148";
+Net "display[12]" loc="p144";
+Net "display[13]" loc="p146";
+Net "display[14]" loc="p141";
+Net "display[15]" loc="p143";
