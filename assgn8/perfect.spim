@@ -1,0 +1,47 @@
+
+#Submission for group 17
+#Author - kaustubh
+.data
+    prompt: .asciiz "Enter a positive integer:"
+    deny:	.asciiz " is not a perfect number"
+    accept: .asciiz " is a perfect number"
+.text
+.globl main
+main: li $v0 , 4       		 # loads the value 4 into register $v0 which is the code for print string
+    la $a0 , prompt    		 # load address prompt from memory and store it into arguement register 0
+    syscall            		 # reads register $v0 for op code, sees 4 and prints the string located in $a0
+    li $v0 , 5         		 # load memory for input
+    syscall            		 # ask for input n
+
+    move $t0, $v0		 # create a local copy for printing the number
+    la $v0 , 1			 # create space for printing an int
+    move $a0, $t0		 # pass variable for printing to argument
+    syscall			 # print the number now
+  				 # Initialise variables
+    move $s0 , $a0     		 # Store input in $s0
+    li $s1 , 0         		 # The sum of all proper divisors of input
+    li $s2 , 1         		 # iterator for numbers less than input n , i
+    
+loop:  bgeu $s2, $s0, printfinal# while i < n branch greater than equal to assign
+    rem $t0, $s0, $s2   	# $t0 = n % i -- t0 is temporary variable
+    bne $t0, $0, inc		# check if remainder is 0
+    addu $s1, $s1, $s2  	# $s1 += $s2 add i to sum if remainder is 0
+    
+inc:  addi $s2, $s2, 1    	# increment value of i
+    j loop;                	# jump to loop 
+   	  
+metallo: li $v0,4		# run this loop if n != sum of divisors
+	 la $a0, deny
+	 syscall		# printing denied as perfect number
+   	  jr $ra		# return address after completion
+   	  	 
+printfinal: seq $s0, $s0, $s1 	# Compare the sum of divisors with n  
+	   li $v0 , 4 
+	   addi $t0, $zero , 0
+
+	   beq $s0,$t0 , metallo # run if $s0 == 0
+	  
+	    la $a0, accept	#if we are here , it means number is perfect
+	   syscall
+	   jr $ra
+	

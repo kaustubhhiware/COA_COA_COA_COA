@@ -1,0 +1,30 @@
+Net "clk" loc="p76";
+Net "inputnum[0]" loc="p10";
+Net "inputnum[1]" loc="p9";
+Net "inputnum[2]" loc="p12";
+Net "inputnum[3]" loc="p11";
+Net "inputnum[4]" loc="p15";
+Net "inputnum[5]" loc="p13";
+Net "inputnum[6]" loc="p18";
+Net "inputnum[7]" loc="p16";
+
+Net "Go" loc="p5";
+Net "rst" loc="p7";
+
+
+Net "result[0]" loc="p139";
+Net "result[1]" loc="p140";
+Net "result[2]" loc="p137";
+Net "result[3]" loc="p138";
+Net "result[4]" loc="p133";
+Net "result[5]" loc="p135";
+Net "result[6]" loc="p131";
+Net "result[7]" loc="p132";
+Net "result[8]" loc="p149";
+Net "result[9]" loc="p150";
+Net "result[10]" loc="p147";
+Net "result[11]" loc="p148";
+Net "result[12]" loc="p144";
+Net "result[13]" loc="p146";
+Net "result[14]" loc="p141";
+Net "result[15]" loc="p143";
