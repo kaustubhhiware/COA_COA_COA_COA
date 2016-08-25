@@ -1,6 +1,7 @@
 
 #Submission for group 17
-#Author - kaustubh
+#Kaustubh Hiware 14CS30011  
+#Rameshwar Bhaskaran 14CS30027
 .data
     prompt: .asciiz "Enter a positive integer:"
     deny:	.asciiz " is not a perfect number"

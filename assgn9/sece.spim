@@ -5,7 +5,7 @@
 	prompt: .asciiz "Enter the count of elements to be read : "
 	next: .asciiz "\nEnter the next element : "
 	finalstart: .asciiz "The second largest number among ["
-	finalmid: .asciiz "The second largest number [] is "
+	finalmid: .asciiz "] is "
 	space: .asciiz " "
 	newline: .asciiz "\n"
 	#maxstr: .asciiz "max is "
@@ -34,16 +34,17 @@ main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code
 
 				# loop initiate for scanning array
 	move $s1, $zero		# i = 0  $s1 is i
+	la $a2, finalstart	#format final printing string
 
 ReadIn: beq $s1, $t1, Indone	# if n==i , go to processing
 	
 	#li $v0,5		#Fancy print -ask for ith element
-	#la $a0, next
-	#syscall
-	
+#	la $a0, next
+#	syscall
+	 
 	li $v0, 5		# Take input
 	syscall
-
+	
         sll $s2, $s1, 2		# Calculate array offset for this loop
         add $s2, $fp, $s2
       
@@ -94,18 +95,7 @@ Indone:				# We have the array now , use it for finding max
 #	syscall
 #	move $v0, $t6		# Restore balance in universe
 #	j MaxLoop
-
-
-secondChange:
-	lw $v0, 0($t0)
-	lw $v1, 4($t0)
-	li $t2,2
 	
-	#move $t7, $v0
-	#li $v0,5 
-	#la $a1, finalstart	#format final printing string
-	#syscall
-	#move $v0, $t7
 FindMax:			# int Max(array, length); result returned in $v0,
     
     	sw   $fp, 0($sp)	# Backup return address and fp on stack.
@@ -120,38 +110,27 @@ FindMax:			# int Max(array, length); result returned in $v0,
 	slt $t3, $v0, $v1 # if $t3 is one , update $v0
 	bne  $t3, $zero, firstChange
 	beq $t3, $zero, secondChange
-    	#li $t2, 2		# Loop initialization, i = 2	
+    	#li $t2, 2		# Loop initialization, i = 2
 	
-#tempLoop:
-#	j verify
-#	j MaxLoop
-	
+    	
 firstChange:
 	lw $v0, 4($t0)
 	lw $v1, 0($t0)
 	li $t2, 2
 
-	#move $t7, $v0
-	#li $v0,5 
-	#la $a1, finalstart	#format final printing string
-	#syscall
-	#move $v0, $t7
-			
+secondChange:
+	lw $v0, 0($t0)
+	lw $v1, 4($t0)
+	li $t2,2
+	
+#tempLoop:
+#	j verify
+#	j MaxLoop
+	
 MaxLoop:		
         slt $t3, $t2, $t1	# while i < n
         beq $t3, $zero, MaxLoopDone	# terminate loop if Max num found
-			
-				#---	printing part
-	#move $t7, $v0
-	#li $v0, 1
-	#move $a0, $t7		#Print current number
-	#syscall
-	#li $v0, 4
-	#la $a0, newline
-	#syscall
-	#move $v0, $t7
-				#--- print part pause
-				
+
         sll $t3, $t2, 2		# Calculate element offset, store address in $t3
         add $t3, $t0, $t3
 
