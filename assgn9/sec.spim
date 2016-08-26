@@ -3,9 +3,9 @@
 # Rameshwar Bhaskaran 14CS30027
 .data
 	prompt: .asciiz "Enter the count of elements to be read : "
-	next: .asciiz "\nEnter the next element : "
+	next: .asciiz "Enter the next element : "
 	finalstart: .asciiz "The second largest number among ["
-	finalmid: .asciiz "The second largest number [] is "
+	finalmid: .asciiz "] is "
 	space: .asciiz " "
 	newline: .asciiz "\n"
 	#maxstr: .asciiz "max is "
@@ -37,9 +37,9 @@ main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code
 
 ReadIn: beq $s1, $t1, Indone	# if n==i , go to processing
 	
-	#li $v0,5		#Fancy print -ask for ith element
-	#la $a0, next
-	#syscall
+	li $v0,4		#Fancy print -ask for ith element
+	la $a0, next
+	syscall
 	
 	li $v0, 5		# Take input
 	syscall
@@ -53,6 +53,10 @@ ReadIn: beq $s1, $t1, Indone	# if n==i , go to processing
 
 Indone:				# We have the array now , use it for finding max
 
+	la $a0, finalstart		#start printing for final
+	li $v0, 4		# Second largest number is
+	syscall	
+	
 	move $a0, $fp		# Keep a copy for a[0]
 	move $a1, $s1		# a1 is n
 
@@ -100,7 +104,7 @@ secondChange:
 	lw $v0, 0($t0)
 	lw $v1, 4($t0)
 	li $t2,2
-	
+	j MaxLoop
 	#move $t7, $v0
 	#li $v0,5 
 	#la $a1, finalstart	#format final printing string
@@ -130,7 +134,7 @@ firstChange:
 	lw $v0, 4($t0)
 	lw $v1, 0($t0)
 	li $t2, 2
-
+	j MaxLoop
 	#move $t7, $v0
 	#li $v0,5 
 	#la $a1, finalstart	#format final printing string
@@ -157,15 +161,15 @@ MaxLoop:
 
         lw   $t4, 0($t3)	# Load array element at $t3, check if it's the new max
         sgt  $t5, $t4, $v1	# set greater than . If a[i] > second max till now , $t5 = 1 else 0
-        beq  $t5, $zero, notGreater	# if current element less than max, i++
+        beq  $t5, $zero, inc	# if current element less than max, i++
 
 	lw $v1, 0($t3)		# second max = max ,
         sgt  $t5, $t4, $v0	# same comparison , only this time with first max
-        beq  $t5, $zero, notGreater
+        beq  $t5, $zero, inc
         move $v1, $v0
         lw $v0, 0($t3)		# max , new_max
         
-notGreater:
+inc:
 	addi $t2, $t2, 1	# i++
         j MaxLoop
         

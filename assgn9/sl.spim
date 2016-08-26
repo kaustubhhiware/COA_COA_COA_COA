@@ -8,8 +8,8 @@
 	finalmid: .asciiz "] is "
 	space: .asciiz " "
 	newline: .asciiz "\n"
-	#maxstr: .asciiz "max is "
-	#secmax: .asciiz "sec is "
+	maxstr: .asciiz " max is "
+	secmax: .asciiz " sec is "
 .text
 .globl main
 main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code for print string
@@ -34,7 +34,6 @@ main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code
 
 				# loop initiate for scanning array
 	move $s1, $zero		# i = 0  $s1 is i
-	la $a2, finalstart	#format final printing string
 	j ReadIn
 	
 ReadIn: beq $s1, $t1, Indone	# if n==i , go to processing
@@ -55,23 +54,123 @@ ReadIn: beq $s1, $t1, Indone	# if n==i , go to processing
 
 Indone:				# We have the array now , use it for finding max
 
-	move $a0, $a2		#start printing for final
-	li $v0, 4
+	la $a0, finalstart		#start printing for final
+	li $v0, 4		# Second largest number is
 	syscall	
 	
 	move $a0, $fp		# Keep a copy for a[0]
 	move $a1, $s1		# a1 is n
 
-	jr $ra
+	jal findMax
 	
+	li $v0, 4
+	la $a0, finalmid	# print " ] is "
+	syscall	
+#	move $t0, $t8		# Back up return val
+#	move $a0, $t0		# Print final value
+#	li   $v0, 1
+#	syscall
+#	la $a0, newline		# Newline 
+#	li $v0, 4
+#	syscall
+#
+#   	li $v0, 10		# Exit program
+#   	syscall
+
+findMax:
+    	sw   $fp, 0($sp)	# Backup return address and fp on stack.
+    	sw   $ra, 4($sp)
+    	addi $fp, $sp, 8
+    	move $sp, $fp
+    	
+    	move $t0, $a0		# Load arguments into scratch registers
+    	lw $v0, 0($t0)		# set max as a[0] - v0
+	lw $v1, 4($t0)		# set second max as a[1] - v1
+	slt $t3, $v0, $v1	# if $t3 is one , update $v0
 	
+	li $t2, 2		# i = 2
+	bnez $t3, firstChange	# max < second max
+	j MaxLoop
+
+firstChange:			# if a[1] > a[0]
+	lw $v0, 4($t0)		# switch v1 and v0
+	lw $v1, 0($t0)
+	j MaxLoop
 	
+#printCurrent: 			# print $t4 and space
+#	move $a0, $t4
+#	li $v0, 4
+#	syscall
+#	
+#	li $v0, 5		# print a space
+#	la $a0, space
+#	syscall
 	
+#status: 
+#	li $v0, 4
+#	la $a0, maxstr
+#	syscall
+#		
+#	li $v0, 1
+#	move $a0, $t9
+#	syscall
+#	
+#	li $v0, 4
+#	la $a0, secmax
+#	syscall
+#		
+#	li $v0, 1
+#	move $a0, $t9
+#	syscall
+#	j MaxLoop
+		
+MaxLoop:
+        slt $t3, $t2, $t1	# while i < n
+        beq $t3, $zero, exit#MaxLoopDone	# terminate loop if Max num found
+
+        sll $t3, $t2, 2		# Calculate element offset, store address in $t3
+        add $t3, $t0, $t3
+
+        lw   $t4, 0($t3)	# Load array element at $t3, check if it's the new max
+#	 jal printCurrent	# print current element as per question
+        
+        move $t5, $v0			#-- printing begins
+	move $a0, $t4
+	li $v0, 4
+	syscall
 	
-	
-	
-	
-	
-	
-	
-	
+	li $v0, 5		# print a space
+	la $a0, newline
+	syscall        						
+        move $v0, $t5			#-- printing ends
+        
+        sgt  $t5, $t4, $v1	# set greater than . If a[i] > second max till now , $t5 = 1 else 0
+        beq  $t5, $zero, inc	# if current element less than max, i++
+
+	move $v1, $t4		# second max = current
+        sgt  $t5, $t4, $v0	# same comparison , only this time with first max
+        beq  $t5, $zero, inc
+       	move $v1, $v0
+        move $v0, $t4		# max , new_max
+     #   j status
+        
+inc:
+	addi $t2, $t2, 1	# i++
+        j MaxLoop
+
+exit:
+	jr $ra		
+MaxLoopDone:
+	# Unwind stack
+	#beq $t7, $zero, eraseMax
+	lw   $ra, -4($fp)
+	move $sp, $fp
+	lw   $fp, -8($fp)
+	jr   $ra
+
+#termination code - do NOT question its presence , needed for no errors	
+#li $v0,10
+#syscall
+
+jr $ra
+
