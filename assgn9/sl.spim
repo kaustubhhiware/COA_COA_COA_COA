@@ -1,0 +1,77 @@
+# Submission for Group 17
+# Kaustubh Hiware 14CS30011
+# Rameshwar Bhaskaran 14CS30027
+.data
+	prompt: .asciiz "Enter the count of elements to be read : "
+	next: .asciiz "Enter the next element : "
+	finalstart: .asciiz "The second largest number among ["
+	finalmid: .asciiz "] is "
+	space: .asciiz " "
+	newline: .asciiz "\n"
+	#maxstr: .asciiz "max is "
+	#secmax: .asciiz "sec is "
+.text
+.globl main
+main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code for print string
+    	la $a0 , prompt    	 # load address prompt from memory and store it into arguement register 0
+    	syscall          	 # reads register $v0 for op code, sees 4 and prints the string located in $a0
+    	li $v0 , 5         	 # load memory for input
+    	syscall            	 # ask for input n
+    
+    	
+   	move $t0, $v0		 # create a local copy for printing the number
+   	la $t1, ($t0)		# keep a copy of n  =>   $t1 is n
+   	sll $t0,$t0,2		# multiply by four for memory
+    	#la $v0 , 1		 # create space for printing an int
+    	#move $a0, $t0		 # pass variable for printing to argument
+	#syscall
+	
+	move $fp, $sp		# keep a safe copy
+	#push n to stack
+	#addi $sp, $sp, -4
+	#sw $t0 , 0($sp)
+	add $sp, $sp , $t0	# dynamically allocate memory to stack pointer
+
+				# loop initiate for scanning array
+	move $s1, $zero		# i = 0  $s1 is i
+	la $a2, finalstart	#format final printing string
+	j ReadIn
+	
+ReadIn: beq $s1, $t1, Indone	# if n==i , go to processing
+	
+	li $v0,4		#Fancy print -ask for ith element
+	la $a0, next
+	syscall
+	 
+	li $v0, 5		# Take input
+	syscall
+	
+        sll $s2, $s1, 2		# Calculate array offset for this loop
+        add $s2, $fp, $s2
+      
+        sw  $v0, 0($s2)		# Store array value at calculated address
+        addi $s1, $s1, 1	# i++
+        j ReadIn        
+
+Indone:				# We have the array now , use it for finding max
+
+	move $a0, $a2		#start printing for final
+	li $v0, 4
+	syscall	
+	
+	move $a0, $fp		# Keep a copy for a[0]
+	move $a1, $s1		# a1 is n
+
+	jr $ra
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
