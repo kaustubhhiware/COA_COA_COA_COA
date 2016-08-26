@@ -30,8 +30,8 @@ main:
     
     	move $t3, $t1			#t3 will have m*n - now it is m
     	mult $t3, $t2			#mutliply m by n
-  	mfhi $a2 # 32 most significant bits of multiplication to $a2
-  	mflo $v0 # 32 least significant bits of multiplication to $v0  
+  	mfhi $a2 			# 32 most significant bits of multiplication to $a2
+  	mflo $v0 			# 32 least significant bits of multiplication to $v0  
   	move $t3, $v0  	
 
    	la $t4, ($t3)		# keep a copy of mn  =>   $t4 is mn
@@ -41,7 +41,31 @@ main:
 	move $s0, $sp		# s0 is B
 	add $sp, $sp, $t3	
 	move $s1, $sp		#s1 is C
-    
+	add $sp, $sp, $t3	# space for C
+	
+	jal populate 		# Rameshwar sambhal lega
+	
+				#Now the matrices A and B are populated , print both matrices
+	move $s3, $fp		# address of a[0][0]
+	jal matPrint
+	move $s3, $s0
+	jal matPrint		# address of b[0][0]
+	
+	
+	
+matPrint:			# print the matrix whose M[0][0] is at $s3
+    	sw   $s4, 0($s3)	# Backup return address and fp on stack.
+    	sw   $ra, 4($s3)
+    	addi $s4, $sp, 8
+    	move $s3, $s4
+    	
+    	
+	
+	
+	
+	
+	
+	
     
 just_print:
 	li $v0, 5

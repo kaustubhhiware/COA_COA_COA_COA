@@ -1,0 +1,49 @@
+.data
+
+spaceChar: .asciiz  " " 
+
+#array of 26 elements 1,0,0,0,0  elements = 5*5
+array: .word 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+size: .word 25
+m:  	.word 4
+endl: .asciiz "\n"
+
+.text
+
+main:
+	lw $t3, size
+	la $t1, array 			# get array address
+	li $t2, 0 			# set loop counter
+
+print_loop:
+	beq $t2, $t3, print_loop_end 	# check for array end
+	#la $a0, m				#li $t5,4 #at 4th element I want next line
+	jal newline			#checking..
+					# print value at the array pointer
+	lw  $a0, ($t1)    		# print array[index]
+	li  $v0, 1        		# syscall: print integer
+	syscall
+					# print space
+	la  $a0, spaceChar  		# print character " "
+	li  $v0, 4          		# syscall: print string
+	syscall
+
+	addi $t2, $t2, 1 		# advance loop counter
+	addi $t1, $t1, 4 		# advance array pointer
+	j print_loop 			# repeat the loop
+
+
+print_loop_end: 
+	li $v0,10
+	syscall
+
+returnkar: jr $ra
+newline:
+        li $t6,5
+	div $t2,$t6
+	mfhi $t5		#t5 is  1 if t2 greater than  m
+	bne $t5,0, returnkar		
+	la $a0,endl
+	li $v0,4
+	syscall
+	jr $ra
