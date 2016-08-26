@@ -29,40 +29,18 @@ main:
 	move $t2, $v0		 	# t2 now stores n
     
     	move $t3, $t1			#t3 will have m*n - now it is m
-    	
-    	li $v0, 4
-	la $a0, printstr
-	syscall
-	
-	 li $v0, 1
-	 move $a0, $t3
-	 syscall
-	 li $v0, 4
-	 la $a0, newline
-	 syscall 
-	 
-    	
     	mult $t3, $t2			#mutliply m by n
   	mfhi $a2 # 32 most significant bits of multiplication to $a2
   	mflo $v0 # 32 least significant bits of multiplication to $v0  
   	move $t3, $v0  	
-    		li $v0, 4
-	la $a0, printadd
-	syscall
-	
-	 li $v0, 1
-	 move $a0, $t3
-	 syscall
-	 li $v0, 4
-	 la $a0, newline
-	 syscall 
-	#move $t0, $v0		 # create a local copy for printing the number
-   	#la $t1, ($t0)		# keep a copy of n  =>   $t1 is n
-   	#sll $t0,$t0,2		# multiply by four for memory
-	
-#	move $fp, $sp		# keep a safe copy
-#	add $sp, $sp , $t0	# dynamically allocate memory to stack pointer
 
+   	la $t4, ($t3)		# keep a copy of mn  =>   $t4 is mn
+   	sll $t3,$t3,2		# multiply by four for memory	
+	move $fp, $sp		# keep a safe copy - fp is A
+	add $sp, $sp , $t3	# dynamically allocate memory to stack pointer
+	move $s0, $sp		# s0 is B
+	add $sp, $sp, $t3	
+	move $s1, $sp		#s1 is C
     
     
 just_print:
