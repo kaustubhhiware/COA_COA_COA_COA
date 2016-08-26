@@ -119,8 +119,27 @@ FindMax:			# int Max(array, length); result returned in $v0,
 
     	move $t0, $a0		# Load arguments into scratch registers
     	move $t1, $a1
+    	
+    				#-- need to print first two numbers separately , since i = 2 for comparison
     	lw $v0, 0($t0)		# set max as a[0]
 	lw $v1, 4($t0)		# set second max as a[0]
+    	move $t3, $v0
+    	
+    	move $a0, $v0
+    	li $v0, 1
+    	syscall
+	li $v0, 4
+	la $a0, space
+	syscall
+
+	li $v0, 1
+    	move $a0, $v1
+    	syscall
+	li $v0, 4
+	la $a0, space
+	syscall  
+	move $v0, $t3		#-- printing pauses , now compare and initialise max and second max
+    				
 	slt $t3, $v0, $v1 # if $t3 is one , update $v0
 	bne  $t3, $zero, firstChange
 	beq $t3, $zero, secondChange
@@ -144,22 +163,24 @@ firstChange:
 MaxLoop:		
         slt $t3, $t2, $t1	# while i < n
         beq $t3, $zero, MaxLoopDone	# terminate loop if Max num found
-			
-				#---	printing part
-	#move $t7, $v0
-	#li $v0, 1
-	#move $a0, $t7		#Print current number
-	#syscall
-	#li $v0, 4
-	#la $a0, newline
-	#syscall
-	#move $v0, $t7
-				#--- print part pause
 				
         sll $t3, $t2, 2		# Calculate element offset, store address in $t3
         add $t3, $t0, $t3
 
         lw   $t4, 0($t3)	# Load array element at $t3, check if it's the new max
+      
+        				#---	printing part
+	move $t6, $v0
+	li $v0, 1
+	move $a0, $t4		#Print current number
+	syscall
+	li $v0, 4
+	la $a0, space
+	syscall
+	move $v0, $t6
+				#--- print part pause
+          
+            
         sgt  $t5, $t4, $v1	# set greater than . If a[i] > second max till now , $t5 = 1 else 0
         beq  $t5, $zero, inc	# if current element less than max, i++
 
