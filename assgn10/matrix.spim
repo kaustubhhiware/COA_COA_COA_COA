@@ -35,53 +35,53 @@ main:
 	move $fp,$sp			# keep a safe copy
 	subu $fp,$fp,4			# next element
 
-	li $s0,4			# allocating space for A,B and C matrices
+	li $s0,4				# allocating space for A,B and C matrices
 	mulou $s1,$t2,$t1		# s1 = m*n
-    	mulou $s0,$s0,$s1		# s0 = 4*m*n
+    mulou $s0,$s0,$s1		# s0 = 4*m*n
 
 	move $t6,$s0			# s6 = space for each matrix
 
    	subu $sp,$sp,$s0		#  address of A[0][0]
-    	move $t3,$sp
-    	move $t7,$t3
+    move $t3,$sp
+    move $t7,$t3
 
-    	subu $sp,$sp,$s0		# address of B[0][0]
-    	move $t4,$sp
-    	move $t8,$t4
+    subu $sp,$sp,$s0		# address of B[0][0]
+    move $t4,$sp
+    move $t8,$t4
 
    	subu $sp,$sp,$s0		# address of C[0][0]
-    	move $t5,$sp
+    move $t5,$sp
 
- 	li $s0,1			# i = 0
+ 	li $s0,1				# i = 0
 
-   	 sw $t0,0($t3)			# A[0][0] = seed
-   	 addi $t3,$t3,4			# increment iterator for A
+   	sw $t0,0($t3)			# A[0][0] = seed
+   	addi $t3,$t3,4			# increment iterator for A
 
-  	  addi $s1,$t0,10
+  	addi $s1,$t0,10
 
-  	  sw $s1,0($t4)			# B[0][0] = seed + 10
-  	  addi $t4,$t4,4		# increment iterator for B
+  	sw $s1,0($t4)			# B[0][0] = seed + 10
+  	addi $t4,$t4,4			# increment iterator for B
 
-   	 mulou $t6,$t1,$t2		# t6 now stores m * n
+   	mulou $t6,$t1,$t2		# t6 now stores m * n
 
 populate:	
-	beq $s0,$t6,printA_B		# if s0 == m*n, proceed to printing A and B
+	beq $s0,$t6,printA_B	# if s0 == m*n, proceed to printing A and B
 
 	lw $s1,-4($t3)			# save next element
-	li $s2,330			# s2 = 7 * 47 + 1 => a
+	li $s2,330				# s2 = 7 * 47 + 1 => a
 	mulou $s1,$s1,$s2
 
 	addi $s1,$s1,100
 
-	li $s3,2303			# s3 = 48^2 - 1 => m
+	li $s3,2303				# s3 = 48^2 - 1 => m
 	remu $s1,$s1,$s3		# s1 = s1 % s3
 
 	sw $s1,0($t3)			# A[i] is recorded
 
-					## Rule for populating Matrices : Xn+1 = (aXn+c) mod m
+							## Rule for populating Matrices : Xn+1 = (aXn+c) mod m
 					
 	lw $s1,-4($t4)			# move to the next element for computation
-	li $s2,330			# s2 = 7 * 47 + 1 => a
+	li $s2,330				# s2 = 7 * 47 + 1 => a
 	mulou $s1,$s1,$s2
 
 	addi $s1,$s1,100		# add c = 100 for rule
@@ -98,7 +98,7 @@ populate:
 	j populate				
 
 printA_B:
-	li $v0,4			# print matrixAstr
+	li $v0,4				# print matrixAstr
 	la $a0,matrixAstr
 	syscall
 
@@ -107,13 +107,13 @@ printA_B:
 	move $a2,$t7
 	sw   $ra, -4($sp)  
 
-   	 jal printMat			
+   	jal printMat			
 
-   	 li $v0,4 			# print newline
+   	li $v0,4 				# print newline
 	la $a0,newline
 	syscall
 
-	li $v0,4			# print matrixBstr
+	li $v0,4				# print matrixBstr
 	la $a0,matrixBstr
 	syscall
 
@@ -122,21 +122,21 @@ printA_B:
 	move $a2,$t8
 	sw   $ra, -4($sp)  
 
-    	jal printMat			
+    jal printMat			
 
-	move $a0,$t6 			#arguements storing for addMat for C
+	move $a0,$t6 			# arguments storing for addMat for C
 	move $a1,$t7
 	move $a2,$t8
 	move $a3,$t5
 	sw   $ra, -4($sp)
 
-	jal addMat			# adding matrices A and B , saving it at C
+	jal addMat				# adding matrices A and B , saving it at C
 
-	li $v0,4 			# print newline
+	li $v0,4 				# print newline
 	la $a0,newline
 	syscall
 
-	li $v0,4			# print matrixBstr
+	li $v0,4				# print matrixCstr
 	la $a0,matrixCstr
 	syscall
 
@@ -145,17 +145,17 @@ printA_B:
 	move $a2,$t5
 	sw   $ra, -4($sp)  
 
-    	jal printMat			
+    jal printMat			
     	
 	move $sp,$fp			# recall saved value
-	li $v0,10			# use to exit the program , because jr $ra isn't working 
+	li $v0,10				# use to exit the program , because jr $ra isn't working 
 	syscall
 
-printMat : 				## PrintMat takes a matrix stored at $a0 of size a1 * a2
+printMat : 					## PrintMat takes a matrix stored at $a0 of size a1 * a2
 	move $s2,$a0 			# store in scratch registers for processing
 	move $s3,$a1
 	move $s4,$a2	
-	li $s0,0 			# s0 = i = 0 for 'loopOverRow'
+	li $s0,0 				# s0 = i = 0 for 'loopOverRow'
 
 	li $v0,4           		# print newline
 	la $a0,newline
@@ -164,19 +164,19 @@ printMat : 				## PrintMat takes a matrix stored at $a0 of size a1 * a2
 	j loopOverRow 			# jump to 'loopOverRow'
 
 loopOverRow : 
-	beq $s0,$s2,returnKar 		# if i = m, jump to 'returnKar'
+	beq $s0,$s2,returnKar 	# if i = m, jump to 'returnKar'
 
-	li $s1,0 			# j = 0 for 'addIndividual' (nested loop)
+	li $s1,0 				# j = 0 for 'addIndividual' (nested loop)
 	j loopOverColumn
 
 loopOverColumn :
-	beq $s1,$s3,rowOver 		# if j = n, jump to 'rowOver'
+	beq $s1,$s3,rowOver 	# if j = n, jump to 'rowOver'
 
 	li $v0,4 			
 	la $a0,space 
 	syscall
 
-	li $v0,1 			# printing the current value in register $t4
+	li $v0,1 				# printing the current value in register $t4
 	lw $a0,0($s4)
 	syscall
 
@@ -186,7 +186,7 @@ loopOverColumn :
 
 
 rowOver:
-	li $v0,4 			# move to next line for new row
+	li $v0,4 				# move to next line for new row
 	la $a0,newline
 	syscall
 
@@ -194,10 +194,10 @@ rowOver:
 	j loopOverRow 			# jump to loopOverRow
 
 returnKar :		
-	jr $ra  			# what the name says
+	jr $ra  				# what the name says
 
 
-addMat :				## Take matrices a1 and a2 , sum at s3 , with a0 as index < m*n
+addMat :					## Take matrices a1 and a2 , sum at s3 , with a0 as index < m*n
 	move $s0,$a0 			# storing in copies to change the copy
 	move $s1,$a1
 	move $s2,$a2
