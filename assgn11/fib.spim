@@ -1,0 +1,112 @@
+# Submission for Group 17
+# Kaustubh Hiware 14CS30011
+# Rameshwar Bhaskaran 14CS30027
+# Supposed to print all fibonacci strings upto n
+.data
+	prompt:   	.asciiz "Enter an integer m (no less than 2): "
+	newline:   	.asciiz "\n"
+	space:   	.asciiz " "
+	stage_i:   	.asciiz "S[ "
+	stage_close: 	.asciiz " ]: "
+	stage0:		.asciiz "0"
+	stage1:		.asciiz "01"
+	
+
+.text
+.globl main
+main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code for print string
+    	la $a0 , prompt    	 # load address prompt from memory and store it into arguement register 0
+    	syscall          	 # reads register $v0 for op code, sees 4 and prints the string located in $a0
+    	li $v0 , 5         	 # load memory for input
+    	syscall            	 # ask for input n
+    	
+   	move $t0, $v0		 # create a local copy for printing the number
+   	la $t1, ($t0)		# keep a copy of n  =>   $t1 is n
+   	addu $t0,$t0,1		# numbers from 0 1, 2, 3 , ...n
+	sll $t0,$t0,2		# multiply by four for memory
+	 
+	 
+	move $fp, $sp		# keep a safe copy
+	addu $sp, $sp , $t0	# dynamically allocate memory to stack pointer
+				# loop initiate for filling array
+	
+#	la $t2, stage0
+#	la $t4, 0
+#	jal printStage
+	
+#	la $t2, stage1
+#	la $t4, 1
+#	jal printStage
+	
+	j initials
+	#li $v0,10 		# return back
+	#syscall
+
+printStage:			## Print stage [ $s0 ]  = $t3 / 0($t2)
+	li $v0, 4
+	la $a0, stage_i
+	syscall
+	
+	li $v0, 1
+	move $a0, $s0		# which stage
+	syscall
+	
+	li $v0, 4
+	la $a0, stage_close
+	syscall
+	
+	
+	#move
+	la $a0, 0($t2)		# what string
+	syscall
+		
+	li $v0,5
+	la $a0, newline
+	syscall
+	jr $ra
+
+initials:
+    	sw   $fp, 0($sp)	# Backup return address and fp on stack.
+   	sw   $ra, 4($sp)
+   	addi $fp, $sp, 8
+    	move $sp, $fp
+    	
+	move $s0, $zero		# i = 0  $s0 is i    	
+    	move $t2,$sp		# t2 for changing the elements
+    	la  $t3, stage0		# initial setting first and second strings
+	#jal printStage
+	
+	sw $t3, 0($t2)
+	jal printStage
+	addi $t2, $t2, 4
+	
+	addi $s0,$s0,1
+	la $t3, stage1
+	#jal printStage
+	
+	sw $t3, 0($t2)
+	jal printStage
+	addi $t2, $t2, 4		# go to next element
+	
+  	j fillIn
+
+fillIn:				## fill the array accordingly
+	jr $ra
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+jr $ra
