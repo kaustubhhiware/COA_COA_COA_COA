@@ -56,8 +56,8 @@ printStage:			## Print stage [ $s0 ]  = $t3 / 0($t2)
 	syscall
 	
 	
-	#move
-	la $a0, 0($t2)		# what string
+	#move $a0, $t3
+	la $a0, 0($sp)		# what string
 	syscall
 		
 	li $v0,5
@@ -76,22 +76,23 @@ initials:
     	la  $t3, stage0		# initial setting first and second strings
 	#jal printStage
 	
-	sw $t3, 0($t2)
+	sw $t3, 0($sp)
 	jal printStage
-	addi $t2, $t2, 4
+	addi $sp, $sp, 4
 	
 	addi $s0,$s0,1
 	la $t3, stage1
 	#jal printStage
 	
-	sw $t3, 0($t2)
+	sw $t3, 0($sp)
 	jal printStage
-	addi $t2, $t2, 4		# go to next element
+	addi $sp, $sp, 4		# go to next element
 	
   	j fillIn
 
 fillIn:				## fill the array accordingly
-	jr $ra
+	li $v0,10
+	syscall
 
 
 
