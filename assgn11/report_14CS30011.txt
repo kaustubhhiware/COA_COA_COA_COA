@@ -1,0 +1,47 @@
+#Report for Group 17
+#Kaustubh Hiware 14CS30011
+# Fibonacci words
+
+The differences between MIPS and a high level language are as below:
+
+As one can see , in C++ , we are not allocating space for the string , nor making any
+space on the stack . The string size allocation and space is handled by the language and 
+its compiler itself.
+However , writing the same in MIPS requires us to allocate space on the stack pointer and
+making space for the same . 
+
+In C/C++ , the approach followed is a top down approach ,however MIPS has the freedom for
+both approaches , i.e, Top down or bottom up . Both the approaches are equally convenient.
+
+Our approach in MIPS has been via memoisation , however for C++ , it is a simple recursion
+.
+
+The concerned assignment was written in MIPS . Below is the code for the same in a higher
+level language (C++).
+~~~~~~~~~
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+string fib(int n)
+{
+	if(n==0)
+		return "0";
+	if(n==1)
+		return "01";
+	else
+	{
+		return fib(n-1)+fib(n-2);
+	}
+}
+int main()
+{
+	int n;
+	cout<<"Enter the value of n: ";
+	cin>>n;
+	cout<<"The corresponding string is: ";
+	cout<<fib(n);
+	return 0;
+}
+~~~~~~~~

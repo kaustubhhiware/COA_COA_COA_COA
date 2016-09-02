@@ -1,0 +1,44 @@
+#Report for Group 17
+# Rameshwar Bhaskaran 14CS30027
+# Fibonacci words
+
+The code for Fibonacci words in a high level language(c++) is as follows: 
+>>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+string fib(int n)
+{
+	if(n==0)
+		return "0";
+	if(n==1)
+		return "01";
+	else
+	{
+		return fib(n-1)+fib(n-2);
+	}
+}
+int main()
+{
+	int n;
+	cout<<"Enter the value of n: ";
+	cin>>n;
+	cout<<"The corresponding string is: ";
+	cout<<fib(n);
+	return 0;
+}
+>>
+
+C++ does not require us to malloc space for the string , nor making any space on the 
+stack . All this is done internally by its compiler.
+For MIPS ,we need to allocate space on the stack pointer and making space for all strings
+. 
+
+In C/C++ , since no space is to be allocated , a top down approach is more apt .In Mips, 
+since space is allocated for each string , both approaches(top down or bottom up) are
+equally convenient.
+
+Another difference is C++ does not keep copies (or rather the optimal code) , however
+our approach in MIPS is via memoisation.
