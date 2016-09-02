@@ -10,13 +10,16 @@
 	stage_close: 	.asciiz " ]: "
 	stage0:		.asciiz "0\n"
 	stage1:		.asciiz "01\n"
-	formatter: 	.space 20 #512 bytes for strings
+	formatter: 	.space 512 #512 bytes for strings
 	s3kyahai:	.asciiz "s3  = "
 	s2kyahai:	.asciiz "s2  = "
 	s1kyahai:	.asciiz "s1  = "
 	doosra:		.asciiz "Move on to the next part : \n"
 	doneStr:	.asciiz "Welcome to done !\n"
 	doneStr2:	.asciiz "Print kar diya mein string , abhi ja !"
+	utlimate:	.space 255
+	penutlimate:	.space 255
+	current:	.space 255	
 .text
 .globl main
 main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code for print string
@@ -30,9 +33,10 @@ main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code
    	addu $t0,$t0,1		# numbers from 0 1, 2, 3 , ...n
 	sll $t0,$t0,2		# multiply by four for memory
 	# supposedly , this shouldn't work as length could be upto 255
-	#mulou $t0 ,$t0,255
+#	mulou $t0 ,$t0,255
 	 
 	move $fp, $sp		# keep a safe copy
+	move $t7,$sp
 	addu $sp, $sp , $t0	# dynamically allocate memory to stack pointer
 				# loop initiate for filling array
 	
@@ -79,12 +83,13 @@ initials:
     	
 	
 	move $s0, $zero		# i = 0  $s0 is i    	
-    	move $t2,$sp		# t2 for changing the elements
+    	move $t2,$t7		# t2 for changing the elements
     	la  $t3, stage0		# initial setting first and second strings
 	#jal printStage	
 	move $s1, $t3		# update for further loops
 	
 	move $t2, $t3
+
 	jal printStage
 	addi $t2, $t2, 4
 	
@@ -108,16 +113,16 @@ fillIn:				## fill the array accordingly
 	jal strcpy		#gives us a string at s3 which is the current concatenation
 	
 	## code below this line in fillIn shifted to sDone
-	move $t2, $s3		# save concat at proper location
-	
-	move $s1, $s2		# update for next loop
-	move $s2, $s3
-				
-				# printing and adding done at sDone
-	addi $t2, $t2, 4	# go to next stage
-	
-	j fillIn		# recursion
-
+#	move $t2, $s3		# save concat at proper location
+#	
+#	move $s1, $s2		# update for next loop
+#	move $s2, $s3
+#				
+#				# printing and adding done at sDone
+#	addi $t2, $t2, 4	# go to next stage
+#	
+#	j fillIn		# recursion
+#
 
 updates3:	
 				## print s3 ka value
@@ -177,15 +182,14 @@ strcpy:				## effective operation : concatenates strings at s2 and s1 and saves 
         sb   $s4 0($t6)
         addi $t5 $t5 1
         addi $t6 $t6 1
-        jal updates3		# this hasn't given any trouble yet , so ignore here
+        jal updates3		# this hasn't given any trouble yet , so ignore here         
         j sCopyFirst
 
     sCopySpace:
 
         li   $s4 ' '
+       # move $s1,$s2
         j sCopySecond
-       # sb   $t0 0($a2)
-        #addi $a2 $a2 1 
 
     #loop through second string and copy to output string 
     sCopySecond:
@@ -193,14 +197,15 @@ strcpy:				## effective operation : concatenates strings at s2 and s1 and saves 
 	li $v0, 4
 	la $a0, doosra		# move on to next part
 	syscall
-
+	jal updates3
+	
         lb   $s4 0($t4)
         beq  $s4 $zero sDone #exit on null byte
         beq  $s4 $s5 sDone   #exit on new-line
         sb   $s4 0($t6)
         addi $t4 $t4 1
         addi $t6 $t6 1
-        jal updates3        
+        jal updates3		
         j sCopySecond
 
 returnKar :		
@@ -222,9 +227,11 @@ returnKar :
 
 	move $t2, $s3		# save concat at proper location
 	jal printStage
-		
-	move $s1, $s2		# update for next loop
-	move $s2, $s3
+				# NOTE : can't move $s2 to $s1 , that means s2 and s1 link !
+	#la $s2, 0($t2)		# update for next loop
+	#la $s1, -4($t2)
+	move $s1,$s2
+	move $s2,$s3
 				
 	addi $t2, $t2, 4	# go to next stage
       
