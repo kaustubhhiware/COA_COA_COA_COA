@@ -10,11 +10,12 @@
 	stage_close: 	.asciiz " ]: "
 	stage0:		.asciiz "0\n"
 	stage1:		.asciiz "01\n"
-	formatter: 	.space 512 #512 bytes for strings
+	formatter: 	.space 20 #512 bytes for strings
 	s3kyahai:	.asciiz "s3  = "
+	s2kyahai:	.asciiz "s2  = "
+	s1kyahai:	.asciiz "s1  = "
 	doosra:		.asciiz "Move on to the next part : \n"
 	doneStr:	.asciiz "Welcome to done !\n"
-	fillInstr:	.asciiz "Back to fillin'\n"
 	doneStr2:	.asciiz "Print kar diya mein string , abhi ja !"
 .text
 .globl main
@@ -28,7 +29,8 @@ main:	li $v0 , 4       	 # loads the value 4 into register $v0 which is the code
    	la $t1, ($t0)		# keep a copy of n  =>   $t1 is n
    	addu $t0,$t0,1		# numbers from 0 1, 2, 3 , ...n
 	sll $t0,$t0,2		# multiply by four for memory
-	 
+	# supposedly , this shouldn't work as length could be upto 255
+	#mulou $t0 ,$t0,255
 	 
 	move $fp, $sp		# keep a safe copy
 	addu $sp, $sp , $t0	# dynamically allocate memory to stack pointer
@@ -100,13 +102,12 @@ initials:
 fillIn:				## fill the array accordingly
 	bge $s0, $t1, exit	# if i > n , exit the program
 
-	la $s3, formatter
+	la $s6,0
+	la $s3, formatter($s6)
+	#la $s3,0		# ye nahi chalega
 	jal strcpy		#gives us a string at s3 which is the current concatenation
 	
-	
-	li $v0,4
-	la $a0, fillInstr
-	syscall 
+	## code below this line in fillIn shifted to sDone
 	move $t2, $s3		# save concat at proper location
 	
 	move $s1, $s2		# update for next loop
@@ -132,14 +133,38 @@ updates3:
 	la $a0, newline
 	syscall
 	
+	li $v0, 4
+	la $a0, s2kyahai
+	syscall
+	 
+	move $a0, $s2
+	la $a1, 512
+	syscall 
+		
+	li $v0,5
+	la $a0, newline
+	syscall
+
+	li $v0, 4
+	la $a0, s1kyahai
+	syscall
+	 
+	move $a0, $s1
+	la $a1, 512
+	syscall 
+		
+	li $v0,5
+	la $a0, newline
+	syscall
 	jr $ra
 	
 strcpy:				## effective operation : concatenates strings at s2 and s1 and saves it at s3
 
-    li $s5 10 #store newline in $s5
+    	li $s5 10 #store newline in $s5
+    	li $s6, 0
     	la $t4, formatter
     	la $t5, formatter
-    	la $t6, formatter    	
+    	la $t6, formatter($s6)    	
 	move $t4, $s1
 	move $t5, $s2
 	move $t6, $s3
@@ -152,7 +177,7 @@ strcpy:				## effective operation : concatenates strings at s2 and s1 and saves 
         sb   $s4 0($t6)
         addi $t5 $t5 1
         addi $t6 $t6 1
-        jal updates3
+        jal updates3		# this hasn't given any trouble yet , so ignore here
         j sCopyFirst
 
     sCopySpace:
@@ -185,29 +210,32 @@ returnKar :
 	li $v0, 4
 	la $a0,doneStr
 	syscall
+	#sb $zero 0($t6)
+	
+	#la $s6, newline			# load address is the approach
+	li $s6, 10		# newline character
 	addi $s0, $s0, 1
-	sb $zero 0($t6) #null terminate string
-	jal printStage
-      
-          li $v0,4
-	la $a0, doneStr2
-	syscall 
-		li $v0,5
-	la $a0, newline
-	syscall
+	sb $s6 0($t6) 	#null terminate string - need to end with \n not \0 !
+	jal updates3
+	
 #	Hope this works , fillIn ka code yaha daal diya
-	
-	li $v0,4
-	la $a0, fillInstr
-	syscall 
+
 	move $t2, $s3		# save concat at proper location
-	
+	jal printStage
+		
 	move $s1, $s2		# update for next loop
 	move $s2, $s3
 				
-				# printing and adding done at sDone
 	addi $t2, $t2, 4	# go to next stage
+      
+        li $v0,4
+	la $a0, doneStr2
+	syscall 
+	jal updates3
 	
+		li $v0,5
+	la $a0, newline
+	syscall	
 	j fillIn		# recursion
 #              
         jr $ra
