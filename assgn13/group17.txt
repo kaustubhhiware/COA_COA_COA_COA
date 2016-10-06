@@ -1,220 +1,78 @@
- *** GROUP 17 ***
- ** RAMESHWAR BHASKARAN - 14CS30027
- ** KAUSTUBH HIWARE - 14CS30011
-   *****
+*** GROUP 17 ***
+** RAMESHWAR BHASKARAN - 14CS30027
+** KAUSTUBH HIWARE - 14CS30011
+*****
 
+INSTRUCTION DESCRIPTIONS
 
-                INSTRUCTION DESCRIPTIONS
+## LOAD OPERATIONS
 
-//LOAD OPERATIONS
+*> LOAD IMMEDIATE : 
 
-//LOAD IMMEDIATE
 Instruction : li r5, #100
 
-RTI :
-     MAR <- PC
-	       Z   <- PC + 2	
-	
-    1 : MDR <- M[MAR]    
-
-    2 : IR  <- MDR
-	 
-    3 : PC  <- Z
-
-    4 : MAR <- PC
-	         MDR <- M[MAR]
-	         Z   <- PC + 2
-			   
-    5 : PC  <- Z		  
- 
-    6 : DestinationRegister <- MDR	
+MAR <- PC  (fn-transX,TPC-1,LMAR-1)
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)
+IR[rb1] <- MDR (fn-transX,L IR[rb1]-1,TMDR-1)
+PC <- PC+2 (r1-PC,r2-2) (r1-PC,r2-2)
 
 
+*> LOAD REGISTER : 
 
-// LOAD REGISTER
 Instruction : lr r5, r7
 
-RTI :
-     1 : MAR <- PC
-               Z   <- PC+ 2
-
-	There is a delay of k seconds.
-
-    1 :   MDR <- M[MAR]	 
-    2 :  IR  <- MDR
-    3 :  PC  <- Z
-    4 :  DestinationRegister <- SourceRegister
+IR[rb1] <- IR[rb2] (fn-transX,L IR[rb1] - 1, T IR[rb1]-1 )
 	
 	
-// LOAD (BASE INDEXED)
+*> LOAD (BASE INDEXED) : 
+
 Instruction: lx r5, 10(r1,r7)
 
-RTI :
-    1 : MAR <- PC
-	      Z   <- PC + 2
+AR <- PC (fn-transX,LMAR-1,TPC-1)(fn-transX,LMAR-1,TPC-1)
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)	
+MDR <- MDR + IR[rb2] (r1-MDR,r2-IR[rb2])
+MAR <- MDR + IR[rx2] (r1-MAR,r1-MDR,r2-IR[rx2])
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)
+IR[rb1] <- MDR (fn-transX,TMDR-1,L IR[rb1] - 1)
+PC <- PC+2 (r1-PC,r2-2)	
+	
+*> LOAD INDIRECT :
 
-	There is a delay of k seconds.
-
-   1 : MDR <- M[MAR]
-   2 : IR  <- MDR
-   3 : PC  <- Z
-   4 : Y   <- SourceRegister1
-   5 : Z   <- Y + SourceRegister2
-   
-	6 : MAR <- PC
-	
-	There is a delay of k seconds.
-    
-    6 : MDR <- M[MAR]
-			 
-    7 : Y   <- MDR
-	
-    8 : Z   <- Z + Y
-	
-    9 : MAR <- Z
-
-	There is a delay of k seconds.
-	
-    9 : MDR <- M[MAR]
-			  
-    10 : DestinationRegister <- MDR
-	
-    11 : Z -> PC + 2
-	
-    12 : PC <- Z
-	
-// LOAD INDIRECT
 Instruction : ldn r5, @10(r1, r7)
 
-RTI :
-	 1 : MAR <- PC
-	          
-		 Z   <- PC + 2
-	
-        There is a delay of k seconds.
-	
-	1 : MDR <- M[MAR]
-	          
-	2 : IR  <- MDR
-	
-	3 : PC  <- Z
-	
-	4 : Y   <- SourceRegister1
-	
-	5 : Z   <- Y + SourceRegister2
-	
-	6 : MAR <- PC
-	
-	There is a delay of k seconds.
-	
-	6 : MDR <- M[MAR]
-			 
-        7 : Y   <- MDR
-	
-	8 : Z   <- Z + Y
-	
-	9 : MAR <- Z
+MAR <- PC
+(fn-transX,LMAR-1,TPC-1)MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)	
+MDR <- MDR + IR[rb2] (r1-MDR,r2-IR[rb2])
+MAR <- MDR + IR[rx2] (r1-MAR,r1-MDR,r2-IR[rx2])
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)MAR <- MDR
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)IR[rb1] <- MDR
+PC <- PC+2 (r1-PC,r2-2)
 
-	There is a delay of k seconds.
-	
-	 9 :  MDR <- M[MAR]
-			  
-	 10 : MAR <- MDR
-		
-	 11 : 
-	
-	There is a delay of k seconds.	
-		      MDR <- M[MAR]
-		      Z <- PC + 2
-			   
-        12 : DestinationRegister <- MDR
-	
-	 13 : PC <- Z
 
-//STORE BASED ADDRESSING
+*> STORE BASED ADDRESSING :
+
 Instruction : stx -5(r2), r3
 
-RTI :
-	 1 : MAR <- PC
-	        
-                  Z   <- PC + 2    
-		
-	There is a delay of k seconds.	          
-
-       1 : MDR <- M[MAR]
-	
-	2 : IR  <- MDR
-	
-	3 : PC  <- Z
-	
-	4 : MAR  <- PC
-
-		    Z    <- PC + 2
-		
-	There is a delay of k seconds.
-	
-	4 : MDR  <- M[MAR]
-			  
-	5 : PC  <-  Z
-	
-	6 : Y  <- SourceRegister
-	
-	7 : Z  <- Y + MDR
-	
-	8 : MAR  <- Z
-	
-	9 : M[MAR] <- SourceRegister2
-
-	There is a delay of k seconds.
+MAR <- PC (fn-transX,LMAR-1,TPC-1)
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)
+MAR <- MDR + IR[rb2] (r1-PC,r2-2)
+MDR <- IR[rb1] (fn-transX, LMDR - 1, T IR[rb1] - 1)
+PC <- PC+2 (r1-PC,r2-2)
 	
 
-//STORE INDIRECT
+*> STORE INDIRECT : 
+
 Instruction : stn @-(r2), r3
 
-RTI :
-    1 : MAR  <- PC
+MAR <- PC (fn-transX,LMAR-1,TPC-1)
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)MAR <- MDR + IR[rb2]
+MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)MAR <- MDR
+MDR <- IR[rb1] (fn-transX,LMDR-1,T IR[rb1])
+PC <- PC+2 (r1-PC,r2-2)
+	
+	
+*> ADD (IMMEDIATE) : 
 
-	      Z    <- PC + 2
-
-    There is a delay of k seconds.
-	
-   1 :	MDR  <- M[MAR]
-			  
-   2 : IR  <- MDR
-	
-   3 : PC  <- Z
-	
-   4 : MAR  <- PC
-		
-		Z    <- PC + 2
-	
-    There is a delay of k seconds.
-	
-    4 : MDR  <- M[MAR]
-			  
-    5 : PC  <- Z
-	
-    6 : Y  <- SourceRegister1
-	
-    7 : Z  <- Y + SourceRegister2
-	
-    8 : Y  <-  Z
-	
-    9 : Z  <- Y + MDR
-	
-    10 : MAR  <- Z
-
-	There is a delay of k seconds.
-	
-    10 : MDR  <- M[MAR]
-				
-    11 : MAR  <- MDR
-	
-    12 : M[MAR] <- SourceRegister2
-	
-	
-	
-// ADD (IMMEDIATE)
 Instruction : addi r1, #43
 
 RTI : 
