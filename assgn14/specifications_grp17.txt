@@ -117,7 +117,7 @@ MDR <- M[MAR] (TMAR-1,RD-1,LMAR-1,RMARX-1)
 IR[rb1] <- IR[rb1] + MDR (r1-IR[rb1], r2-MDR)
 Y <- r2 (Tr2-1,LYX-1)
 r1 <- r1 + Y (fn-add,Tr1-1,TY-1,LDr1-1)
-PC <- PC + 2 (r1-PC,r2-2,see line 46)
+PC <- PC + 2 (r1-PC,r2-2)
 		
 		
 //ADD (REGISTER)		

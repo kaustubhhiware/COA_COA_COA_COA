@@ -1,0 +1,307 @@
+module Controller_FSM(OpCode, PCWrite, PCRead, MemRead, MemWrite, MARWrite, MARRead, MDRWrite, MDRRead, MDRIn1, MDRIn2, MDROut1, MDROut2, IRWrite, RegIn, RegWrite, RegRead,TWrite, TRead, C1Read, AluOpnd, Ldf, Current_State, Out_State);
+input [6:0]OpCode ;
+output PCWrite, PCRead, MemRead, MemWrite, MARWrite, MARRead, MDRWrite, MDRRead, MDRIn1, MDRIn2, MDROut1, MDROut2, IRWrite,  RegWrite, RegRead,TWrite, TRead, C1Read, Ldf;
+output [1:0] RegIn1, RegIn2 ;
+output [2:0] AluOpnd ;
+input [4:0] Current_State ;
+output [4:0] Out_State ;
+assign PCWrite = 1'b0 ;
+assign PCRead= 1'b0 ;
+assign MemRead= 1'b0 ;
+assign MemWrite= 1'b0 ; 
+assign MARWrite = 1'b0 ; 
+assign MARRead= 1'b0 ; 
+assign MDRWrite= 1'b0 ; 
+assign MDRRead= 1'b0 ;
+assign MDRIn1= 1'bz ; 
+assign MDRIn2= 1'bz ; 
+assign MDROut1= 1'bz ; 
+assign MDROut2= 1'bz ; 
+assign IRWrite = 1'b0 ; 
+assign RegIn = 2'b00 ;
+assign RegWrite= 1'b0 ; 
+assign RegRead= 1'b0 ;
+assign TWrite= 1'b0 ; 
+assign TRead= 1'b0 ; 
+assign C1Read = 1'b0 ; 
+assign AluOpnd = 3'b101 ;
+assign Ldf = 1'b0 ;
+
+always@(*)
+begin
+	casex(Current_State)
+
+	5'b00000:
+		PCRead = 1'b1 ;
+		MemRead = 1'b1 ;
+		IRWrite = 1'b1 ;
+		TWrite = 1'b1 ;
+		Out_State = 5'b00001
+	5'b00001:
+		C1Read = 1'b1 ;
+		TRead = 1'b1 ;
+		AluOpnd = '3'b000 ;
+		PCWrite 1'b1 ;
+		always@(Opcode)
+		begin
+		casex(OpCode[6:5])
+		2'b00 :
+			begin
+			if(Opcode[4:1] == 4'b1110)
+				Out_State = 5'b10001 ;
+			else
+				Out_State = 5'b00100 ;
+			end
+		2'b01 :
+			if(Opcode[4:2] == 3'b000 or Opcode[4:2] = 3'b111)
+				Out_State = 5'b00010 ;
+			else 
+				Out_State = 5'b00100 ;
+		2'b10 :
+			Out_State = 5'b10001 ;
+		2'b11 :
+			begin
+			if(Opcode[0] == 1'b0)
+				Out_State = 5'b11000 ;
+			else 
+				Out_State = 5'b11100 ;
+			end
+		end 
+	5'b00010:
+		RegIn  = 2'b00 ;
+		RegRead = 1'b1 ;
+		TWrite  = 1'b1 ;
+		always@(Opcode)
+		begin 
+		if(Opcode[4:2] == 111)
+			Out_State = 5'b00011 ;
+		else 
+			Out_State = 5'b01101 ;
+		end
+	5'b00011:
+		RegIn = 2'b01 ;
+		RegRead = 1'b1 ;
+		AluOpnd = 3'b000 ;
+		RegWrite = 1'b1 ;
+		Out_State =5'b00000 ;
+	5'b00100:
+		PCRead =1'b1 ;
+		MDRWrite =1'b1 ;
+		MemRead = 1'b1 ;
+		MDRIn2 = 1'b1 ;
+		Out_State = 5'b00101 ;
+	5'b00101:
+		RegIn = 2'b01 ;
+		TWrite = 1'b1 ;
+		RegRead =1'b1 ;
+		always@(Opcode)
+		begin
+		if(OpCode[6:5] == 01)
+			Out_State = 5'b00110 ;
+		else
+			Out_State = 5'b01011 ;
+	5'b00110:
+		MARWrite 1'b1 ;
+		TRead =1'b1 ;
+		MDRRead = 1'b1 ;
+		MDROut1 = 1'b1 ;
+		AluOpnd = 3'b000 ;
+	5'b00111:
+		MARRead = 1'b1 ;
+		MemRead =1'b1 ;
+		MDRWrite =1'b1 ;
+		MDRIn2 = 1'b1 ;
+		Out_State = 5'b01000 ;
+	5'b01000:
+		TWrite =1'b1 ;
+		RegIn = 2'b00; 
+		RegRead = 1'b1 ;
+		Out_State = 5'b01001 ;
+	5'b01001:
+		MDRRead =1'b1 ;
+		MDROut1 =1'b1 ;
+		AluOpnd = 3'b000 ;
+		TRead =1'b1 ;
+		RegWrite = 1'b1 ;
+		Out_State = 5'b00000;
+	5'b01010:
+		MDRRead =1'b1 ;
+		MDROut1 = 1'b1 ;
+		MARWrite =1'b1 ;
+		
+	5'b01011:
+		PCRead = 1'b1 ;
+		MARWrite =1'b1 ;
+		always@(Opcode)
+		begin
+		if(OpCode[6:5] == 2'b00)
+			begin
+			if(Opcode[1] == 1'b0)
+				Out_State = 5'b10101 ;
+			else 
+				Out_State = 5'b10110 ;
+			end
+		else
+			Out_State = 5'b01100 ;
+		end
+	5'b01100:
+		MARRead =1'b1 ;
+		MemRead = 1'b1 ;
+		MDRWrite =1'b1 ;
+		MDRIn2 = 1'b1 ;
+		always@(Opcode)
+		begin
+		if(OpCode[6:5] == 2'b01)
+			begin
+			if(Opcode[4:2] == 3'b000)
+				Out_State = 5'b00010 ;
+			else 
+				Out_State = 5'b01101 ;
+			end
+
+		else
+			begin
+			if(Opcode[6:1] == 6'b001000 or OpCode[6:1] == 6'b001001)
+				Out_State = 5'b01010 ;
+			else
+				Out_State = 5'b10010 ;
+			end
+		end
+	5'b01101:
+		MDRRead = 1'b1 ;
+		TRead = 1'b1 ;
+		MDRIn1 = 1'b1 ;
+		MDRWrite = 1'b1 ;
+		AluOpnd = 3'b000 ;
+		Out_State = 5'b01110 ;
+	5'b01110:
+		TWrite =1'b1 ;
+		RegIn = 2'b01; 
+		RegRead = 1'b1 ;
+		Out_State = 5'b01111 ;
+	5'b01111:
+		MDRRead =1'b1 ;
+		MDROut1 = 1'b1 ;
+		TRead = 1'b1 ;
+		AluOpnd = 3'b000 ;
+		MARWrite =1'b1 ;
+		always@(OpCode)
+		begin
+		if(OpCode[6:5] == 2'b00)
+			begin
+			if(OpCode[4:2]== 3'b001)
+				begin
+				if(Opcode[1] == 1'b0)
+					Out_State = 5'b01100 ;
+				else 
+					Out_State = 5'b11010 ;
+				end
+			else
+				Out_State = 5''b10011 ;
+			end
+		else
+			Out_State = 5'b10000 ;
+		end
+	5'b10000:
+		MDRWrite =1'b1 ;
+		MDRIn2 =1'b1 ;
+		MemRead = 1'b1 ;
+		MARRead =1'b1 ;
+		TWrite = 1'b1 ;
+		RegRead = 1'b1 ;
+		RegIn = 2'b00 ;
+		always@(OpCode)
+		begin
+		if(Opcode[6:2] == 5'b01100)
+			Out_State = 5'b01010 ;
+		else 
+			Out_State = 5'b01001 ;
+		end
+	5'b10001:
+		RegRead =1'b1 ;
+		RegIn = 2'b01 ;
+		MDRWrite =1'b1 ;
+		MDRIn1 = 1'b1 ;
+		Out_State = 5'b10010 ;
+	5'b10010:
+		MDRRead = 1'b1 ;
+		RegWrite = 1'b1 ;
+		MDROut1 = 1'b1 ;
+		Out_State =5'b00000;
+	5'b10011:
+		TWrite =1'b1 ;
+		MARRead =1'b1 ;
+		Out_State = 5'b10100 ;
+	5'b10100:
+		TRead =1'b1 ;
+		RegRead = 1'b1 ;
+		RegIn = 2'b01;
+		MARWrite =1'b1 ;
+		AluOpnd = 3'b000 ;
+		Out_State = 5'b01100 ;
+	5'b10101:
+		MDRWrite = 1'b1 ;
+		MARRead =1'b1 ;
+		MemRead = 1'b1 ;
+		TRead =1'b1 ;
+		RegIn = 2'b01 ;
+		RegRead = 1'b1 ;
+		Out_State = 5'b00000 ;
+	5'b10110:
+		MDRWrite = 1'b1 ;
+		MDRIn2 = 1'b1 ;
+		MARRead 1'b1 ;
+		MemRead =1'b1 ;
+		always@(*)
+		begin
+			if(OpCode[6] == 1)
+				Out_State = 5'b11001;
+
+			else 
+				Out_State = 5'b10111;
+		end
+	5'b10111:
+		TWrite =1'b1 ;
+		RegRead = 1'b1 ;
+		RegIn = 2'b00 ;
+		Out_State = 5'b00000 ;
+	5'b11000:
+		TWrite = 1'b1 ;
+		PCRead = 1'b1 ;
+		MARWrite = 1'b1 ;
+		Out_State = 5'b10110 ;
+	5'b11001:
+		PCWrite = 1'b1 ;
+		AluOpnd = 3'b000 ;
+		MDRRead =1'b1 ;
+		MDROut1 = 1'b1 ;
+		TRead = 1'b1 ;
+		Out_State = 5'b11101 ;
+	5'b11010:
+		MDRWrite = 1'b1 ;
+		MDRIn1 = 1'b1 ;
+		RegRead = 1'b1 ;
+		RegIn = 2'b01 ; 
+	5'b11011:
+		MemWrite = 1'b1 ;
+		MDRRead = 1'b1 ;
+		MDROut2 = 1'b1 ;
+		MARRead = 1'b1 ;
+		Out_State = 5'b0000 ;
+	5'b11100:
+		RegIn = 2'b00 ;
+		RegRead =1'b1 ;
+		PCWrite =1'b1 ;
+		Out_State = 5'b00000 ;
+	5'b11101:
+		TWrite = 1'b1 ;
+		PCRead = 1'b1 ;
+		Out_State = 5'b11110 ;
+	5'b11110:
+		RegWrite = 1'b1 ;
+		C1Read =1'b1 ;
+		AluOpnd = 3'b000 ;
+		TRead = 1'b1 ;
+		Out_State = 5'b00000 ;
+	end
+endmodule
