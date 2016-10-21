@@ -20,20 +20,6 @@ module register(in,load,clk,rst,ts,out);
   
 endmodule
 
-/*module register(in, out, clk ,load, rst);
-
- output [15:0] out;
- input [15:0] in;
- input clk, rst,load;
- reg [15:0] out;
- always @(posedge clk)
- 	begin
- 	if (rst) out <= 0;
- 	else if(load) out <= in;
-  	end
-endmodule
-*/
-
 
 module tristate(in,out,enable);
 	
@@ -90,6 +76,88 @@ module demux38(in,out,enable,clk,rst);
 	end
 	end
 	
+endmodule
+
+module ALU(
+	operandA,
+	operandB,
+	oper_code,
+	result,
+	flags	
+    );
+	 parameter DWIDTH = 16;
+	 
+	 //INPUT PORTS
+	 input[DWIDTH-1:0] operandA;
+	 input[DWIDTH-1:0] operandB;
+	 input[2:0] oper_code;
+	 
+	 //OUTPUT PORTS
+	 output[DWIDTH-1:0] result;
+	 output[3:0] flags;
+	 
+	 reg[DWIDTH-1:0] a,b,result;
+	 wire carry,sign,overflow,zero;
+	 wire overflow_a, carry_a;
+	 reg cin;
+	 
+	 //INTERNAL WIRES
+	 parameter ADD = 3'b100, SUB = 3'b101, AND = 3'b110, OR = 3'b111, COMP = 3'b001;
+	 wire [DWIDTH-1:0]andresult,orresult,adderresult;
+	 always@(oper_code or operandA or operandB)begin
+         if(~oper_code[2]) begin
+               a = 'b0;
+         end
+         else 
+            a = operandA;
+         if(~oper_code[1] & oper_code[0]) begin
+               b = ~operandB;
+               cin = 1;
+         end
+         else begin
+            b = operandB;
+            cin = 0;
+         end
+	 end
+	       
+	 
+	 and_module a_m(
+	   .a(a),
+	   .b(b),
+	   .result(andresult)	 
+	 );
+	 
+	 or_module o_m(
+	   .a(a),
+	   .b(b),
+	   .result(orresult)
+	 );
+	 
+	CLA_block_16bit adder(
+     	.x(a),			
+     	.y(b),			
+     	.c_in(cin),		
+     	.s(adderresult),			
+     	.c_out(carry_a),
+     	.overflow(overflow_a)		
+       );
+       always@(oper_code or adderresult or orresult or andresult )begin
+           if(!oper_code[1])
+                result = adderresult;
+           else begin
+                if(oper_code[2])
+                    result = orresult;
+                else
+                    result = andresult;
+           end
+       end
+       
+       assign sign = result[DWIDTH-1];
+       assign zero = result == 'b0;	 
+       assign overflow = (oper_code[1]?overflow_a:0);
+       assign carry = (oper_code[1]?carry_a:0);
+       assign flags = {carry,sign,overflow,zero};
+	 
 endmodule
 
 module reg_bank(PA, rdr,wrr,wPA,clk,rst,out); //wPA is the data we want to write
@@ -225,3 +293,4 @@ rmdri,rmarx,pa,rdr,wpa,wrr,fnsel,vin,cin,datain,dataout);
 	tristate ifh(mdrout,tmdr2x,bus);
 
 endmodule
+
