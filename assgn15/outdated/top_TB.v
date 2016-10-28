@@ -49,7 +49,33 @@ module testTop;
 		#100;
         
 		// Add stimulus here
+		rst = 1;
+		datain = 16'b 0000000000000000;
+		
+		// Wait 100 ns for global reset to finish
+		#100;
+        
 
+		rst = 0;
+		datain = 16'b 0000000000111010;
+		
+		// Wait 100 ns for global reset to finish
+		#100;
+        
+
+		rst = 0;
+		datain = 16'b 0010100111000000;
+		
+		// Wait 100 ns for global reset to finish
+		#100;
+        
+
+		rst = 0;
+		datain = 16'b 0000000001001011;
+	
+		// Wait 100 ns for global reset to finish
+		#100;
+        
 	end
       
 endmodule

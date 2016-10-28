@@ -81,18 +81,18 @@ endmodule
 module test_datapath;
 
 	//input 
-	reg lmar,lt,lpc,lir,lmdr,ldx,ldy,tt,tpc,tp,t2,tmdr2x,tmdrext,rmdri,rmarx,wrr,rdr;
+	reg lmar,lt,lpc,lir,lmdr,ldx,ldy,abus,tt,tpc,tp,t2,tmdr2x,tmdrext,rmdri,rmarx,pa,rdr,wpa,wrr,fnsel;
 	reg[2:0] pa,wpa;
 	reg[2:0] fnsel;
 	reg[15:0] datain;
+	reg[15:0] dataout;
 
 	//output 
 	wire[15:0] dataout;
-	wire[15:0] abus;
 	wire vin, cin,zin,sin;
 
 	// Instantiate the Unit Under Test (UUT)
-	datapath DP (lmar,lt,lpc,lir,lmdr,ldx,ldy,abus,tt,tpc,tp,t2,tmdr2x,tmdrext,
+	datapath DP(lmar,lt,lpc,lir,lmdr,ldx,ldy,abus,tt,tpc,tp,t2,tmdr2x,tmdrext,
 				rmdri,rmarx,pa,rdr,wpa,wrr,fnsel,vin,cin,datain,dataout);
 	
 	
@@ -107,24 +107,101 @@ module test_datapath;
 		clk = 0;
 		// Wait 100 ns for global reset to finish
 		#100;
-		lt=1;datain = 16'b0000000000001100;lt=0;
-		fnsel = 2'b00;
-		lt=1;datain = 16'b0000000000000010;lt=0;
+		lmar=1;
+		lt=0;
+		lpc=0;
+		lir=1;
+		lmdr=0;
+		ldx=0;
+		ldy=0;
+		tt=0;tpc=0;tp=0;t2=0
+		tmdr2x=0;
+		tmdrext=0;
+		rmdri=1;
+		rmarx=1;
+		pa=1;
+		rdr=0;
+		wpa=0;
+		wrr=1;
+		fnsel=0;
 
 		#100;
 		lt=1;datain = 16'b0000000000001100;lt=0;
 		fnsel = 2'b00;
 		lt=1;datain = 16'b0000000000000010;lt=0;
 		
+		lmar=0;
+		lt=0;
+		lpc=0;
+		lir=1;
+		lmdr=1;
+		ldx=0;
+		ldy=0;
+		tt=0;tpc=0;tp=0;t2=0
+		tmdr2x=0;
+		tmdrext=0;
+		rmdri=0;
+		rmarx=0;
+		pa=0;
+		rdr=1;
+		wpa=0;
+		wrr=1;
+		fnsel=0;
+		
 		#100;
 		lt=1;datain = 16'b0000000000001100;lt=0;
 		fnsel = 2'b00;
 		lt=1;datain = 16'b0000000000000010;lt=0;
+			lt=1;datain = 16'b0000000000001100;lt=0;
+		fnsel = 2'b00;
+		lt=1;datain = 16'b0000000000000010;lt=0;
+			lt=1;datain = 16'b0000000000001100;lt=0;
+		fnsel = 2'b00;
+		lt=1;datain = 16'b0000000000000010;lt=0;
+		
+		lmar=1;
+		lt=1;
+		lpc=0;
+		lir=1;
+		lmdr=1;
+		ldx=0;
+		ldy=0;
+		tt=0;
+		tpc=0;
+		tp=1;
+		t2=1;
+		tmdr2x=0;
+		tmdrext=0;
+		rmdri=0;
+		rmarx=0;
+		pa=0;
+		rdr=1;
+		wpa=0;
+		wrr=1;
+		fnsel=0;
+		
+
 
 		#100;
 		lt=1;datain = 16'b0000000000001100;lt=0;
 		fnsel = 2'b00;
-		lt=1;datain = 16'b0000000000000010;lt=0;
+				lmar=0;
+		lt=0;
+		lpc=0;
+		lir=1;
+		lmdr=1;
+		ldx=0;
+		ldy=0;
+		tt=0;tpc=0;tp=0;t2=0
+		tmdr2x=0;
+		tmdrext=0;
+		rmdri=0;
+		rmarx=0;
+		pa=0;
+		rdr=1;
+		wpa=0;
+		wrr=1;
+		fnsel=0;
 	end
       
 endmodule
