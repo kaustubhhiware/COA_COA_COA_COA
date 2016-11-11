@@ -256,45 +256,8 @@ module ALU_Core(ALUSrc1 , ALUSrc2 , ALUCtrl , ALUResult , Zero);
 endmodule
 
 
-module ALU_Control(FunctField, ALUOp, ALUCtrl);
-input [5:0]FunctField;
-input [1:0]ALUOp;
-output [2:0]ALUCtrl;
-reg [2:0]ALUCtrl;
-
-always@(FunctField or ALUOp)
-begin
-    if(ALUOp == 2'b10)      //'Arithmetic' Type Instructions
-    begin
-      case(FunctField)        
-      //begin
-        6'b100000: ALUCtrl = 3'b010;    //ADDITION in 'R' Type
-        6'b100010: ALUCtrl = 3'b110;    //SUBTRACTION in 'R' Type
-        6'b100100: ALUCtrl = 3'b000;    //AND in 'R' Type
-        6'b100101: ALUCtrl = 3'b001;    //OR in 'R' Type
-        6'b101010: ALUCtrl = 3'b111;    //SLT in 'R' Type
-     // end
-    endcase
-    end
-    
-    if(ALUOp == 2'b00)     // 'LW/SW' Type Instructions
-    begin
-        ALUCtrl = 3'b010;               //ADDITION irrespective of the FunctField.
-    end
-    
-    if(ALUOp == 2'b01)    //   'BEQ', 'BNE' Type Instructions
-    begin
-        ALUCtrl = 3'b110;               //SUBTRACTION irrespective of the FunctField.
-    end        
-    
-
-    
-end   //always block 
-
-endmodule  //ALUOp module
-
 module datapath(lmar,lt,lpc,lir,lmdr,ldx,ldy,abus,tt,tpc,tp,t2,tmdr2x,tmdrext,
-rmdri,rmarx,pa,rdr,wpa,wrr,fnsel,vin,cin,datain,dataout);
+rmdri,rmarx,pa,rdr,wpa,wrr,fnsel,vin,sin,cin,zin,datain,dataout);
 
   input lmar,lt,lpc,lir,lmdr,ldx,ldy,tt,tpc,tp,t2,tmdr2x,tmdrext,rmdri,rmarx,wrr,rdr;
   input[2:0] pa,wpa;
@@ -308,6 +271,7 @@ rmdri,rmarx,pa,rdr,wpa,wrr,fnsel,vin,cin,datain,dataout);
   wire [15:0] out1;
   wire [2:0]ctrl;
   wire [15:0] memInput;
+  wire [15:0] ir;
   wire zero;
   wire a;
   wire selMux1;

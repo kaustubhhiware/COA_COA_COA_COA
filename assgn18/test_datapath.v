@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+/*
 module test_alu_control;
 	// Inputs
 	reg [15:0] ALUSrc1;
@@ -36,7 +38,7 @@ module test_alu_control;
 
 	end
 endmodule
-
+*/
       
 module test_regbank;
 	// Inputs
@@ -109,7 +111,7 @@ module test_datapath;
 		lmdr=0;
 		ldx=0;
 		ldy=0;
-		tt=0;tpc=0;tp=0;t2=0
+		tt=0;tpc=0;tp=0;t2=0;
 		tmdr2x=0;
 		tmdrext=0;
 		rmdri=1;
@@ -132,7 +134,7 @@ module test_datapath;
 		lmdr=1;
 		ldx=0;
 		ldy=0;
-		tt=0;tpc=0;tp=0;t2=0
+		tt=0;tpc=0;tp=0;t2=0;
 		tmdr2x=0;
 		tmdrext=0;
 		rmdri=0;
@@ -187,7 +189,7 @@ module test_datapath;
 		lmdr=1;
 		ldx=0;
 		ldy=0;
-		tt=0;tpc=0;tp=0;t2=0
+		tt=0;tpc=0;tp=0;t2=0;
 		tmdr2x=0;
 		tmdrext=0;
 		rmdri=0;

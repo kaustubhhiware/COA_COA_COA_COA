@@ -1,45 +1,76 @@
 `timescale 1ns / 1ps
 
-//macros
-//instruction width
-`define INSTRUCTION_WIDTH 32
-//number of test vectors
-`define NUM_TEST_VECTORS 10
+module test_alu_control;
+	// Inputs
+	reg [15:0] ALUSrc1;
+	reg [15:0] ALUSrc2;
+	reg [2:0] ALUCtrl;
+	// Outputs
+	wire [15:0] ALUResult;
+	wire Zero;
+	// Instantiate the Unit Under Test (UUT)
+	ALU_Core uut (
+		.ALUSrc1(ALUSrc1), 
+		.ALUSrc2(ALUSrc2), 
+		.ALUCtrl(ALUCtrl), 
+		.ALUResult(ALUResult), 
+		.Zero(Zero)
+	);
+	initial begin
+		// Initialize Inputs
+		ALUSrc1 = 16'b0000000000001100;
+		ALUSrc2 = 16'b1000000000001010;
+		ALUCtrl = 0;//and
+		// Wait 100 ns for global reset to finish
+		#100;
+        
+		// Add stimulus here
+		ALUSrc1 = 16'b0000000000001100;
+		ALUSrc2 = 16'b0000000000001010;
+		ALUCtrl = 3'b111;//slt
+		
+		#100;
+		ALUSrc1 = 16'b0000000000001100;
+		ALUSrc2 = 16'b0000000000001010;
+		ALUCtrl = 3'b110;//sub
+		
+		#100;
 
-module ctrl_tb;
+	end
+endmodule
+
+
+module test_control;
 
 	// Inputs
 	reg [31:0] inst;
 
 	// Outputs
-	wire [4:0] alu_ctrl;
-	wire reg_file_wr_en;
-	wire [1:0] reg_file_wr_back_sel;
-	wire alu_op2_sel;
-	wire d_mem_rd_en;
-	wire d_mem_wr_en;
-	wire [1:0] d_mem_size;
+	wire [4:0] controlALU;
+	wire writeOut;
+	wire [1:0] RegWrite;
+	wire AluOP;
+	wire readDataMem;
+	wire writeDataMem;
+	wire [1:0] sizeDataMem;
 	wire jal;
 	wire jalr;
 
 	// Instantiate the Unit Under Test (UUT)
-	ctrl uut (
-		.alu_ctrl(alu_ctrl), 
-		.reg_file_wr_en(reg_file_wr_en), 
-		.reg_file_wr_back_sel(reg_file_wr_back_sel), 
-		.alu_op2_sel(alu_op2_sel), 
-		.d_mem_rd_en(d_mem_rd_en), 
-		.d_mem_wr_en(d_mem_wr_en), 
-		.d_mem_size(d_mem_size), 
+	controller uut (
+		.inst(inst),	
+		.controlALU(controlALU), 
+		.writeOut(writeOut), 
+		.RegWrite(RegWrite), 
+		.AluOP(AluOP), 
+		.readDataMem(readDataMem), 
+		.WriteDataMem(writeDataMem), 
+		.sizeDataMem(sizeDataMem), 
 		.jal(jal), 
-		.jalr(jalr), 
-		.inst(inst)
+		.jalr(jalr) 
 	);
 	
-	//Test vectors
-	reg [(`INSTRUCTION_WIDTH-1):0] test_vec [(`NUM_TEST_VECTORS-1):0];
-
-	//count variable
+	reg [31:0] test [9:0];
 	integer i;
 	
 	initial begin
@@ -49,49 +80,30 @@ module ctrl_tb;
 		// Wait 100 ns for global reset to finish
 		#100;
         
-		// Add stimulus here
-
-		//Initialize test vector
-		//LUI
-		test_vec[0] = 32'h80000037;
-		//AUIPC
-		test_vec[1] = 32'h80000017;
-		//JAL
-		test_vec[2] = 32'h8020006F;
-		//JALR
-		test_vec[3] = 32'h80000067;
-		//BRANCH (BEQ)
-		test_vec[4] = 32'h800000E3;
-		//LOAD (LB)
-		test_vec[5] = 32'h80000003;
-		//STORE (SB)
-		test_vec[6] = 32'h80000823;
-		//ALU (I-TYPE) (SLTIU)
-		test_vec[7] = 32'h80003013;
-		//SHIFT (SRAI)
-		test_vec[8] = 32'h41005013;
-		//Invalid
-		test_vec[`NUM_TEST_VECTORS - 1] = 32'h00000000;
+		// Add stimulus here	
+		test[0] = 32'h80000037;// lui
+		test[1] = 32'h80000017;// alu pc
+		test[2] = 32'h8020006F;// jal
+		test[3] = 32'h80000067;// jalr
+		test[4] = 32'h800000E3;// beq
+		test[5] = 32'h80000003;// lb
+		test[6] = 32'h80000823;// sb
+		test[7] = 32'h80003013;// alu i tpye
+		test[8] = 32'h41005013;// shift
+		test[9] = 32'h00000000;// null state
 		
-		$display ("\n*-------------------------------------------------*\n");
-		$display ("Reporting the generated control signals :- \n");
+		$display ("Output for control signals \n");
 		
-		//write each one of test vectors and check the output value				
-		for(i=0; i<`NUM_TEST_VECTORS; i = i+1) begin
-			//apply test input
-			inst = test_vec[i];
+		// test individually for each test case				
+		for(i=0; i<10; i = i+1) begin
+			inst = test[i];
 			//delay
 			#5;
-			//report the control signals generated
 			$display ("Input Instruction : %x \n\
-alu_ctrl : %b, reg_file_wr_en : %b, reg_file_wr_back_sel : %b, alu_op2_sel : %b, d_mem_rd_en : %b, \
-d_mem_wr_en : %b, d_mem_size : %b, jal : %b, jalr : %b\n", inst, alu_ctrl, reg_file_wr_en, 
-				reg_file_wr_back_sel, alu_op2_sel, d_mem_rd_en, d_mem_wr_en, d_mem_size, jal, jalr);
+controlALU : %b, writeOut : %b, RegWrite : %b, AluOP : %b, readDataMem : %b, \
+writeDataMem : %b, sizeDataMem : %b, jal : %b, jalr : %b\n", inst, controlALU, writeOut, 
+				RegWrite, AluOP, readDataMem, writeDataMem, sizeDataMem, jal, jalr);
 		end
-		
-		$display ("\n*-------------------------------------------------*\n");
-
-
 	end
-      
 endmodule
+
